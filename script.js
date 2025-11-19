@@ -2,15 +2,24 @@ let airplane = document.getElementById('airplane');
 let finalScore = document.getElementById('score');
 let score = 0;
 
+function generateObstacle(id) {
+        let obstacle = document.createElement('div');
+        obstacle.id = 'obstacle' + id;
+        let randomPos = generateRandomNumber(700);
+        obstacle.style.marginLeft = randomPos + 'px';
+        return obstacle;
+}
+
+function generateRandomNumber(maxValue) {
+    return Math.floor(Math.random() * maxValue);
+}
+
 function generateGame() {
     let obstacles = document.getElementById('obstacles');
     for (let i = 1; i <= 4; ++i) {
-        let obstacle = document.createElement('div');
-        obstacle.id = 'obstacle' + i;
-        let randomPos = Math.floor(Math.random() * 700);
-        let randomNr = Math.floor(Math.random() * 150);
-        obstacle.style.marginLeft = randomPos + 'px';
+        let obstacle = generateObstacle(i);
         obstacles.appendChild(obstacle);
+        let randomNr = generateRandomNumber(150);
         obstaclesMovement(obstacle, -randomNr, 800);
     }
     document.onkeydown = function (keyPressed) {
@@ -29,11 +38,11 @@ function generateGame() {
                 airplane.style.marginTop = nr + "px";
             }
         } else if (direction == 39) {
+            // right
             let nr = pos.left + 50;
             if (nr < window.screen.availWidth) {
                 airplane.style.marginLeft = nr + "px";
             }
-            // right
         } else if (direction == 40) {
             // down
             let nr = pos.top + 40;
@@ -53,6 +62,20 @@ function generateGame() {
                 clearInterval(id);
                 id = setInterval(frame, 5);
                 function frame() {
+                    for (let i = 1; i <= 4; ++i) {
+                        let obstacle = obstacles.childNodes[i];
+                        if (checkCollision(obstacle, projectile)) {
+                            ++score;
+                            finalScore.innerText = "SCORE: " + score;
+                            obstacle.remove();
+                            let newObstacle = generateObstacle(i);
+                            let randomNr = generateRandomNumber(150);
+                            obstacles.appendChild(newObstacle);
+                            obstaclesMovement(newObstacle, -randomNr, 800);
+                            projectile.style.backgroundColor = "transparent";
+                            projectile.remove();
+                        }
+                    }
                     --pos;
                     projectile.style.top = pos + "px";
                 }
