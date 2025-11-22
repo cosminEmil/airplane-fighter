@@ -15,26 +15,18 @@ function generateRandomNumber(maxValue) {
 }
 
 
-function moveLeft(airplanePosition) { 
-    if (airplanePosition.left - 50) {
+function moveLeftandRight (airplanePosition, keyPressed) { 
+    if (airplanePosition.left - 50 && keyPressed == 37) {
         airplane.style.marginLeft = (airplanePosition.left - 50) + "px";
+    } else if (airplanePosition.left + 50 < window.screen.availWidth && keyPressed == 39){
+        airplane.style.marginLeft = (airplanePosition.left + 50) + "px";
     }
 }
 
-function moveUp(airplanePosition) { 
-    if (airplanePosition.top - 70) {
+function moveUpandDown(airplanePosition, keyPressed) { 
+    if (airplanePosition.top - 70 && keyPressed == 38) {
         airplane.style.marginTop = (airplanePosition.top - 70) + "px";
-    }
-}
-
-function moveRight(airplanePos) { 
-    if (airplanePos.left + 50 < window.screen.availWidth) {
-        airplane.style.marginLeft = (airplanePos.left + 50) + "px";
-    }
-}
-
-function moveDown(airplanePosition) {
-    if (airplanePosition.top + 40 < window.screen.availHeight) {
+    } else if (airplanePosition.top + 40 < window.screen.availHeight && keyPressed == 40){
         airplane.style.marginTop = (airplanePosition.top + 40) + "px";
     }
 }
@@ -50,18 +42,12 @@ function generateGame() {
     document.onkeydown = function (keyPressed) {
         let direction = keyPressed.keyCode;
         let airplanePosition = airplane.getBoundingClientRect();
-        if (direction == 37) {
-            // left
-            moveLeft(airplanePosition);
-        } else if (direction == 38) {
-            // up
-            moveUp(airplanePosition)
-        } else if (direction == 39) {
-            // right
-            moveRight(airplanePosition);
-        } else if (direction == 40) {
-            // down
-            moveDown(airplanePosition);
+        if (direction == 37 || direction == 39) {
+            // left & right
+            moveLeftandRight(airplanePosition, direction);
+        } else if (direction == 38 || direction == 40) {
+            // up & down
+            moveUpandDown(airplanePosition, direction);
         } else if (keyPressed.keyCode == 32) {
                 let id = null;
                 clearInterval(id);
