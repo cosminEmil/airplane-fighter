@@ -14,6 +14,31 @@ function generateRandomNumber(maxValue) {
     return Math.floor(Math.random() * maxValue);
 }
 
+
+function moveLeft(airplanePosition) { 
+    if (airplanePosition.left - 50) {
+        airplane.style.marginLeft = (airplanePosition.left - 50) + "px";
+    }
+}
+
+function moveUp(airplanePosition) { 
+    if (airplanePosition.top - 70) {
+        airplane.style.marginTop = (airplanePosition.top - 70) + "px";
+    }
+}
+
+function moveRight(airplanePos) { 
+    if (airplanePos.left + 50 < window.screen.availWidth) {
+        airplane.style.marginLeft = (airplanePos.left + 50) + "px";
+    }
+}
+
+function moveDown(airplanePosition) {
+    if (airplanePosition.top + 40 < window.screen.availHeight) {
+        airplane.style.marginTop = (airplanePosition.top + 40) + "px";
+    }
+}
+
 function generateGame() {
     let obstacles = document.getElementById('obstacles');
     for (let i = 1; i <= 4; ++i) {
@@ -24,44 +49,32 @@ function generateGame() {
     }
     document.onkeydown = function (keyPressed) {
         let direction = keyPressed.keyCode;
-        let pos = airplane.getBoundingClientRect();
+        let airplanePosition = airplane.getBoundingClientRect();
         if (direction == 37) {
             // left
-            let nr = pos.left - 50;
-            if (nr > 0) {
-                airplane.style.marginLeft = (pos.left - 50) + "px";
-            }
+            moveLeft(airplanePosition);
         } else if (direction == 38) {
             // up
-            let nr = pos.top - 70;
-            if (nr > 0) {
-                airplane.style.marginTop = nr + "px";
-            }
+            moveUp(airplanePosition)
         } else if (direction == 39) {
             // right
-            let nr = pos.left + 50;
-            if (nr < window.screen.availWidth) {
-                airplane.style.marginLeft = nr + "px";
-            }
+            moveRight(airplanePosition);
         } else if (direction == 40) {
             // down
-            let nr = pos.top + 40;
-            if (nr < window.screen.availHeight) {
-                airplane.style.marginTop = nr + "px";
-            }
+            moveDown(airplanePosition);
         } else if (keyPressed.keyCode == 32) {
+                let id = null;
+                clearInterval(id);
+                let airplanePos = airplane.getBoundingClientRect();
+                let currentProjectilePosition = airplanePos.top;
                 let projectile = document.createElement("div");
                 let container = document.getElementById("container");
                 projectile.id = "projectile";
-                container.appendChild(projectile);
-                let airplanePos = airplane.getBoundingClientRect();
                 projectile.style.left = (airplanePos.left + 42) + "px";
                 projectile.style.top = airplanePos.top + "px";
-                let pos = airplanePos.top;
-                let id = null;
-                clearInterval(id);
-                id = setInterval(frame, 5);
-                function frame() {
+                container.appendChild(projectile);
+                id = setInterval(() => {
+                    projectileMovement(projectile, airplanePos, currentProjectilePosition);
                     for (let i = 1; i <= 4; ++i) {
                         let obstacle = obstacles.childNodes[i];
                         if (checkCollision(obstacle, projectile)) {
@@ -76,33 +89,41 @@ function generateGame() {
                             projectile.remove();
                         }
                     }
-                    --pos;
-                    projectile.style.top = pos + "px";
-                }
+                    --currentProjectilePosition;
+                }, 5);
             }
         }
 }
 
-function obstaclesMovement(obstacle, startPosition, endPosition) {
-    let pos = startPosition;
-    let id = null;
+function projectileMovement(projectile, airplanePos, currentProjectilePosition) {
+    projectile.style.left = (airplanePos.left + 42) + "px";
+    projectile.style.top = airplanePos.top + "px";
+    projectile.style.top = currentProjectilePosition + "px";
+}
+
+function movement(obstacle, currentObjectPosition, endPosition) {
     let message = document.getElementById("message");
-    clearInterval(id);
-    id = setInterval(frame, 5);
-    function frame() {
-        if (pos == endPosition) {
-            pos = startPosition;
-        } else {
-            if (checkCollision(obstacle, airplane)) {
-                message.innerText = "GAME OVER";
-                setTimeout(() => {
-                    window.location.reload();
-                }, 3 * 1000);
-            }
-            ++pos;
-            obstacle.style.top = pos + "px";
-        }
+    obstacle.style.top = currentObjectPosition + "px";
+    if (checkCollision(obstacle, airplane)) {
+        message.innerText = "GAME OVER";
+        setTimeout(() => {
+            window.location.reload();
+        }, 3 * 1000);
     }
+    obstacle.style.top = currentObjectPosition + "px";
+}
+
+function obstaclesMovement(obstacle, startPosition, endPosition) {
+    let currentObjectPosition = startPosition;
+    let id = null;
+    clearInterval(id);
+    id = setInterval(() => {
+        movement(obstacle, currentObjectPosition, endPosition);
+        ++currentObjectPosition;
+        if (currentObjectPosition == endPosition) {
+            currentObjectPosition = startPosition;
+        }
+    }, 5);
 }
 
 function checkCollision(obj1, obj2) {
