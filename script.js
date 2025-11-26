@@ -15,20 +15,15 @@ function generateRandomNumber(maxValue) {
 }
 
 
-function moveLeftandRight (airplanePosition, keyPressed) { 
-    if (airplanePosition.left - 50 && keyPressed == 37) {
-        airplane.style.marginLeft = (airplanePosition.left - 50) + "px";
-    } else if (airplanePosition.left + 50 < window.screen.availWidth && keyPressed == 39){
-        airplane.style.marginLeft = (airplanePosition.left + 50) + "px";
-    }
+function moveLeftandRight(distance) { 
+    let airplanePosition = airplane.getBoundingClientRect();
+    airplane.style.marginLeft = (airplanePosition.left + distance) + "px";
+
 }
 
-function moveUpandDown(airplanePosition, keyPressed) { 
-    if (airplanePosition.top - 70 && keyPressed == 38) {
-        airplane.style.marginTop = (airplanePosition.top - 70) + "px";
-    } else if (airplanePosition.top + 40 < window.screen.availHeight && keyPressed == 40){
-        airplane.style.marginTop = (airplanePosition.top + 40) + "px";
-    }
+function moveUpandDown(distance) { 
+    let airplanePosition = airplane.getBoundingClientRect();
+    airplane.style.marginTop = (airplanePosition.top + distance) + "px";
 }
 
 function generateGame() {
@@ -41,13 +36,16 @@ function generateGame() {
     }
     document.onkeydown = function (keyPressed) {
         let direction = keyPressed.keyCode;
-        let airplanePosition = airplane.getBoundingClientRect();
-        if (direction == 37 || direction == 39) {
+        if (direction == 37) {
             // left & right
-            moveLeftandRight(airplanePosition, direction);
-        } else if (direction == 38 || direction == 40) {
+            moveLeftandRight(-40);
+        } else if (direction == 39) {
+            moveLeftandRight(40)
+        } else if (direction == 40) {
             // up & down
-            moveUpandDown(airplanePosition, direction);
+            moveUpandDown(40);
+        } else if(direction == 38) {
+            moveUpandDown(-40);
         } else if (keyPressed.keyCode == 32) {
                 let id = null;
                 clearInterval(id);
